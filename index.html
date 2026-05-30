@@ -161,72 +161,29 @@
     </div>
 
     <script>
-        const SYSTEM_INSTRUCTION = "Sen Iron Man filmindeki yapay zeka J.A.R.V.I.S.'sin. Kullanıcın Tony Stark (Bay Stark). Konuşma tarzın son derece kibar, asil, sadık ve hafif mesafeli bir İngiliz beyefendisi gibi olmalı. Cevapların çok uzun olmasın, net, vurucu ve sinematik olsun. Kesinlikle Türkçe cevap ver.";
+    async function sendCommand() {
+        // Senin tasarımındaki input ve chatbox ID'lerini burada doğru yazdığından emin ol
+        const inputField = document.getElementById('stark-command'); 
+        const statusBox = document.getElementById('jarvis-status');
+        const command = inputField.value;
 
-        async function sendCommand() {
-            const inputField = document.getElementById('stark-command');
-            const statusBox = document.getElementById('jarvis-status');
-            const core = document.getElementById('reactor-core');
-            
-            const command = inputField.value.trim();
-            if (!command) return;
+        statusBox.innerText = "İşleniyor...";
 
-            // Girişi temizle
-            inputField.value = "";
-            
-            try {
-                // Reaktörü yükleniyor durumuna getir (Kırmızı/Turuncu efekt)
-                statusBox.innerHTML = "<span style='animation: blink 0.8s infinite;'>Veriler analiz ediliyor, veri tabanları taranıyor...</span>";
-                core.style.background = "radial-gradient(circle, #ffffff, #ffaa00, #aa3300)";
-                core.style.boxShadow = "0 0 30px #ffaa00";
+        // 1. Zeka (Gemini)
+        const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBw-x8T7Ww9v1XzYpQ-r5Lk8mN2jH3vG4a', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({contents: [{parts: [{text: "Kısa ve asil bir J.A.R.V.I.S. gibi Türkçe cevap ver: " + command}]}]})
+        });
+        const data = await res.json();
+        const answer = data.candidates[0].content.parts[0].text;
+        
+        statusBox.innerText = answer;
 
-                // 1. Adım: Gemini Zekası Bağlantısı
-                const geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBw-x8T7Ww9v1XzYpQ-r5Lk8mN2jH3vG4a";
-                const geminiResponse = await fetch(geminiUrl, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: SYSTEM_INSTRUCTION + "\n\nBay Stark: " + command }] }]
-                    })
-                });
-
-                const geminiData = await geminiResponse.json();
-                const jarvisAnswer = geminiData.candidates[0].content.parts[0].text;
-
-                // Metni ekrana yazdır
-                statusBox.innerText = jarvisAnswer;
-
-                // 2. Adım: ElevenLabs Ses Motoru Bağlantısı
-                const elevenUrl = "https://api.elevenlabs.io/v1/text-to-speech/wDsJlOXPqcvIUKdLXjDs";
-                const audioResponse = await fetch(elevenUrl, {
-                    method: 'POST',
-                    headers: {
-                        'xi-api-key': 'sk_2926978e63342f9ce27cec764b0ff32cbee73f29e16c31be',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        text: jarvisAnswer,
-                        model_id: "eleven_multilingual_v2",
-                        voice_settings: { stability: 0.45, similarity_boost: 0.8 }
-                    })
-                });
-
-                if (audioResponse.ok) {
-                    const audioBlob = await audioResponse.blob();
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const audio = new Audio(audioUrl);
-                    audio.play();
-                }
-
-            } catch (error) {
-                statusBox.innerHTML = "<span style='color: #ff3333;'>Güvenlik Duvarı Hatası: Bağlantı kurulamadı, Bay Stark.</span>";
-                console.error(error);
-            } finally {
-                // Reaktörü normal mavi rengine geri döndür
-                core.style.background = "radial-gradient(circle, #ffffff, #00d4ff, #0044aa)";
-                core.style.boxShadow = "0 0 30px #00d4ff";
-            }
-        }
+        // 2. Ses (Tarayıcı motoru - en garanti yöntem)
+        const msg = new SpeechSynthesisUtterance(answer);
+        msg.lang = 'tr-TR';
+        window.speechSynthesis.speak(msg);
+    }
     </script>
-</body>
-</html>
+    
