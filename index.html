@@ -2,81 +2,36 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>J.A.R.V.I.S. OS</title>
+    <title>J.A.R.V.I.S. VOICE</title>
     <style>
-        body { background: #000; color: #00d4ff; font-family: 'Courier New', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .reactor { width: 100px; height: 100px; border: 2px solid #00d4ff; border-radius: 50%; box-shadow: 0 0 15px #00d4ff; margin-bottom: 20px; }
-        #chat { width: 90%; max-width: 500px; height: 300px; border: 1px solid #00d4ff; padding: 15px; overflow-y: auto; background: #050505; }
-        input { width: 70%; padding: 10px; background: #111; border: 1px solid #00d4ff; color: #fff; }
-        button { padding: 10px; background: #00d4ff; border: none; cursor: pointer; }
+        body { background: #000; color: #00d4ff; font-family: 'Courier New', monospace; text-align: center; overflow: hidden; }
+        .hud { border: 1px solid #00d4ff; padding: 20px; margin: 20px; box-shadow: 0 0 10px #00d4ff; }
+        #arc { width: 150px; height: 150px; border: 2px solid #00d4ff; border-radius: 50%; margin: auto; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 10px #00d4ff; } 50% { box-shadow: 0 0 30px #00d4ff; } }
     </style>
 </head>
 <body>
-    <div class="reactor"></div>
-    <div id="chat">Sistem kilitli. Lütfen API anahtarını girin.</div>
-    <div style="width:90%; max-width:540px; display:flex;">
-        <input type="password" id="apiKey" placeholder="Groq API Anahtarı...">
-        <button onclick="setKey()">BAĞLAN</button>
-    </div>
-    <div id="mainInterface" style="display:none; width:90%; max-width:540px;">
-        <input type="text" id="input" placeholder="Komut...">
-        <button onclick="askAI()">GÖNDER</button>
+    <div id="arc"></div>
+    <div class="hud">
+        <p id="status">SİSTEMLER HAZIR, BAY STARK.</p>
+        <textarea id="metin" placeholder="JARVIS'e ne söyletmek istersin?" style="background:#111; color:#00d4ff; width:80%;"></textarea><br>
+        <button onclick="konus()" style="background:#00d4ff; border:none; padding:10px; margin-top:10px;">KOMUTU İŞLE</button>
     </div>
 
     <script>
-        let key = "";
-        function setKey() {
-            key = document.getElementById('apiKey').value;
-            document.getElementById('chat').innerHTML = "Sistem hazır. Bay Stark, komutlarınızı bekliyorum.";
-            document.getElementById('apiKey').style.display = 'none';
-            document.getElementById('mainInterface').style.display = 'flex';
-        }
-
-        async function askAI() {
-            const input = document.getElementById('input');
-            const chat = document.getElementById('chat');
-            const text = input.value;
-            chat.innerHTML += `<br>> <b>Siz:</b> ${text}`;
+        function konus() {
+            const metin = document.getElementById('metin').value || "Sistemler nominal, Bay Stark.";
+            const msg = new SpeechSynthesisUtterance(metin);
             
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: "llama3-70b-8192",
-                    messages: [{role: "user", content: "Sen Jarvis'sin. Çok kısa cevap ver: " + text}]
-                })
-            });
-            const data = await response.json();
-            chat.innerHTML += `<br>> <b>JARVIS:</b> ${data.choices[0].message.content}`;
+            // JARVIS Ses Tonu Ayarı (Mümkün olan en tok sesi seçiyoruz)
+            const voices = window.speechSynthesis.getVoices();
+            msg.voice = voices.find(v => v.lang === 'tr-TR') || voices[0];
+            msg.rate = 0.9; // Daha ağır ve otoriter bir hız
+            msg.pitch = 0.8; // Daha tok bir ton
+            
+            window.speechSynthesis.speak(msg);
+            document.getElementById('status').innerText = "İŞLENİYOR...";
         }
     </script>
 </body>
 </html>
-async function askAI() {
-    const input = document.getElementById('input');
-    const chat = document.getElementById('chat');
-    const text = input.value;
-    chat.innerHTML += `<br>> <b>Siz:</b> ${text}`;
-    
-    // allorigins.win proxy'si sayesinde CORS engelini aşarız
-    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://api.groq.com/openai/v1/chat/completions');
-    
-    try {
-        const response = await fetch(proxyUrl, {
-            method: 'POST',
-            headers: { 
-                'Authorization': 'Bearer ' + key, 
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify({
-                model: "llama3-70b-8192",
-                messages: [{role: "user", content: "Sen Jarvis'sin. Kısa cevap ver: " + text}]
-            })
-        });
-        const data = await response.json();
-        // Proxy'den dönen veriyi işliyoruz
-        chat.innerHTML += `<br>> <b>JARVIS:</b> ${data.contents.choices[0].message.content}`;
-    } catch(e) {
-        chat.innerHTML += `<br>> <b>Sistem:</b> Köprü kurulamadı. Bay Stark, bu sunucu engelleri aştırmıyor.`;
-    }
-}
