@@ -2,35 +2,60 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>J.A.R.V.I.S. VOICE</title>
+    <title>J.A.R.V.I.S. V2</title>
     <style>
-        body { background: #000; color: #00d4ff; font-family: 'Courier New', monospace; text-align: center; overflow: hidden; }
-        .hud { border: 1px solid #00d4ff; padding: 20px; margin: 20px; box-shadow: 0 0 10px #00d4ff; }
-        #arc { width: 150px; height: 150px; border: 2px solid #00d4ff; border-radius: 50%; margin: auto; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 10px #00d4ff; } 50% { box-shadow: 0 0 30px #00d4ff; } }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        body { background: #000; color: #00d4ff; font-family: 'Orbitron', sans-serif; margin: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+        
+        /* HUD Çerçeve */
+        .hud-top { width: 100%; padding: 10px; border-bottom: 2px solid #00d4ff; display: flex; justify-content: space-around; font-size: 10px; }
+        
+        /* Ark Reaktörü */
+        .reactor-container { width: 300px; height: 300px; border: 2px solid #00d4ff; border-radius: 50%; margin: 20px 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 50px #00d4ff; animation: spin 20s linear infinite; }
+        .reactor-core { width: 80px; height: 80px; background: #fff; border-radius: 50%; box-shadow: 0 0 50px #fff; }
+        
+        /* Sohbet Ekranı */
+        #chat-box { width: 90%; height: 250px; background: rgba(0, 20, 30, 0.8); border: 2px solid #00d4ff; padding: 10px; overflow-y: auto; font-size: 12px; }
+        
+        /* Kontrol Paneli */
+        .controls { width: 90%; display: flex; gap: 10px; margin-top: 10px; }
+        input { flex: 1; background: #000; border: 1px solid #00d4ff; color: #00d4ff; padding: 10px; }
+        button { background: #00d4ff; color: #000; border: none; padding: 10px; font-weight: bold; cursor: pointer; }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div id="arc"></div>
-    <div class="hud">
-        <p id="status">SİSTEMLER HAZIR, BAY STARK.</p>
-        <textarea id="metin" placeholder="JARVIS'e ne söyletmek istersin?" style="background:#111; color:#00d4ff; width:80%;"></textarea><br>
-        <button onclick="konus()" style="background:#00d4ff; border:none; padding:10px; margin-top:10px;">KOMUTU İŞLE</button>
+
+    <div class="hud-top"><span>SYSTEMS: NOMINAL</span> <span>AUDIO: ACTIVE</span> <span>LINK: STARK-OS</span></div>
+    
+    <div class="reactor-container">
+        <div class="reactor-core"></div>
+    </div>
+
+    <div id="chat-box"></div>
+
+    <div class="controls">
+        <input type="text" id="userInput" placeholder="KOMUT GİRİN, BAY STARK...">
+        <button onclick="jarvisSpeak()">İSSUE COMMAND</button>
     </div>
 
     <script>
-        function konus() {
-            const metin = document.getElementById('metin').value || "Sistemler nominal, Bay Stark.";
-            const msg = new SpeechSynthesisUtterance(metin);
+        function jarvisSpeak() {
+            const input = document.getElementById('userInput');
+            const chat = document.getElementById('chat-box');
+            const text = input.value;
             
-            // JARVIS Ses Tonu Ayarı (Mümkün olan en tok sesi seçiyoruz)
-            const voices = window.speechSynthesis.getVoices();
-            msg.voice = voices.find(v => v.lang === 'tr-TR') || voices[0];
-            msg.rate = 0.9; // Daha ağır ve otoriter bir hız
-            msg.pitch = 0.8; // Daha tok bir ton
+            chat.innerHTML += `<div>[${new Date().toLocaleTimeString()}] J.A.R.V.I.S.> ${text}</div>`;
             
+            // JARVIS Ses Motoru (Tok ve Otoriter)
+            const msg = new SpeechSynthesisUtterance("Anlaşıldı, Bay Stark. " + text);
+            msg.lang = 'tr-TR';
+            msg.pitch = 0.5; // Daha düşük ve tok ses
+            msg.rate = 0.8;  // Daha sakin ve ağır
             window.speechSynthesis.speak(msg);
-            document.getElementById('status').innerText = "İŞLENİYOR...";
+            
+            input.value = "";
         }
     </script>
 </body>
