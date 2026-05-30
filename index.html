@@ -52,3 +52,31 @@
     </script>
 </body>
 </html>
+async function askAI() {
+    const input = document.getElementById('input');
+    const chat = document.getElementById('chat');
+    const text = input.value;
+    chat.innerHTML += `<br>> <b>Siz:</b> ${text}`;
+    
+    // allorigins.win proxy'si sayesinde CORS engelini aşarız
+    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://api.groq.com/openai/v1/chat/completions');
+    
+    try {
+        const response = await fetch(proxyUrl, {
+            method: 'POST',
+            headers: { 
+                'Authorization': 'Bearer ' + key, 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({
+                model: "llama3-70b-8192",
+                messages: [{role: "user", content: "Sen Jarvis'sin. Kısa cevap ver: " + text}]
+            })
+        });
+        const data = await response.json();
+        // Proxy'den dönen veriyi işliyoruz
+        chat.innerHTML += `<br>> <b>JARVIS:</b> ${data.contents.choices[0].message.content}`;
+    } catch(e) {
+        chat.innerHTML += `<br>> <b>Sistem:</b> Köprü kurulamadı. Bay Stark, bu sunucu engelleri aştırmıyor.`;
+    }
+}
