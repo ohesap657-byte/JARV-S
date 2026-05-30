@@ -1,151 +1,40 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S.</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #000508; overflow: hidden; font-family: 'Share Tech Mono', monospace; color: #00d4ff; }
-        
-        @keyframes fadeIn { from { opacity:0; transform:translateY(4px) } to { opacity:1; transform:translateY(0) } }
-        @keyframes ringPulse { 0%,100%{opacity:0.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.04)} }
-        @keyframes corePulse { from{box-shadow:0 0 20px #00d4ff,0 0 40px #00d4ff60} to{box-shadow:0 0 40px #00d4ff,0 0 80px #00d4ff} }
-        
-        .app-container { height: 100vh; width: 100vw; display: flex; flex-direction: column; position: relative; }
-        .scanline { position: absolute; inset: 0; background: linear-gradient(transparent 50%, rgba(0, 212, 255, 0.03) 50%); background-size: 100% 4px; pointer-events: none; z-index: 1; }
-        
-        .header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #00d4ff20; background: linear-gradient(180deg, #001828 0%, transparent 100%); z-index: 2; }
-        .logo { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 6px; text-shadow: 0 0 20px #00d4ff; }
-        
-        .arc-reactor { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
-        .ring { border-radius: 50%; border: 1px solid #00d4ff; position: absolute; animation: ringPulse 2s ease-in-out infinite; }
-        .core { width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle, #ffffff, #00d4ff, #0066aa); animation: corePulse 0.5s ease-in-out infinite alternate; }
-        
-        .main-content { display: flex; flex: 1; overflow: hidden; z-index: 2; }
-        .sidebar { width: 110px; padding: 16px; border-right: 1px solid #00d4ff10; display: flex; flex-direction: column; gap: 20px; font-size: 11px; }
-        .chat-area { flex: 1; display: flex; flex-direction: column; padding: 0 20px; }
-        .messages { flex: 1; overflow-y: auto; padding: 20px 0; display: flex; flex-direction: column; gap: 16px; }
-        
-        .msg-row { display: flex; gap: 10px; animation: fadeIn 0.3s ease; }
-        .msg-row.user { flex-direction: row-reverse; }
-        .avatar { width: 28px; height: 28px; border: 1px solid #00d4ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; }
-        .bubble { background: linear-gradient(135deg, #001020, #001828); border: 1px solid #00d4ff40; border-radius: 2px 12px 12px 12px; padding: 10px 14px; font-size: 13px; max-width: 75%; }
-        .user .bubble { background: linear-gradient(135deg, #001e2e, #002a3a); border-color: #00d4ff20; border-radius: 12px 2px 12px 12px; color: #80d4ff; }
-        
-        .input-container { padding: 16px 0 20px; border-top: 1px solid #00d4ff15; }
-        .input-box { display: flex; gap: 10px; background: #001020; border: 1px solid #00d4ff40; border-radius: 8px; padding: 6px 6px 6px 16px; align-items: center; }
-        input { flex: 1; background: transparent; border: none; outline: none; color: #b0e8ff; font-family: 'Share Tech Mono', monospace; font-size: 13px; }
-        button { background: linear-gradient(135deg, #003355, #005577); border: 1px solid #00d4ff60; color: #00d4ff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 11px; letter-spacing: 1px; }
-        
-        #boot-screen { position: fixed; inset: 0; background: #000508; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; transition: opacity 0.6s ease; font-family: monospace; font-size: 12px; }
-        .boot-line { color: #004466; margin-bottom: 6px; letter-spacing: 2px; }
-        .boot-line.active { color: #00d4ff; animation: fadeIn 0.2s ease; }
-    </style>
+    <title>J.A.R.V.I.S. V4.2.1</title>
 </head>
-<body>
-
-    <div id="boot-screen">
-        <div class="arc-reactor" style="margin-bottom: 30px;"><div class="ring" style="width:80px; height:80px;"></div><div class="core"></div></div>
-        <div id="boot-text" style="width: 300px;"></div>
-    </div>
-
-    <div class="app-container">
-        <div class="scanline"></div>
-        
-        <div class="header">
-            <div>
-                <div class="logo">J.A.R.V.I.S.</div>
-                <div style="font-size: 9px; color: #00d4ff60; letter-spacing: 2px;">V4.2.1 // ONLINE</div>
-            </div>
-            <div class="arc-reactor"><div class="ring" style="width:60px; height:60px;"></div><div class="ring" style="width:45px; height:45px;"></div><div class="core" style="width:18px; height:18px;"></div></div>
-            <div style="text-align: right; font-family: 'Orbitron', sans-serif;" id="clock">00:00:00</div>
-        </div>
-
-        <div class="main-content">
-            <div class="sidebar">
-                <div>GÜÇ: 98%</div>
-                <div>KALKAN: 100%</div>
-                <div>TEHDİT: 0%</div>
-                <hr style="border-color:#00d4ff10; margin:10px 0;">
-                <div style="color:#00d4ff60;">SİSTEM: NOMİNAL</div>
-            </div>
-            
-            <div class="chat-area">
-                <div class="messages" id="chat-messages">
-                    <div class="msg-row">
-                        <div class="avatar">AI</div>
-                        <div class="bubble">Sistemler aktif. Hoş geldiniz Bay Stark. Nasıl yardımcı olabilirim?</div>
-                    </div>
-                </div>
-                
-                <div class="input-container">
-                    <div class="input-box">
-                        <span>&gt;_</span>
-                        <input type="text" id="user-input" placeholder="Komut girin, Bay Stark..." onkeydown="if(event.key === 'Enter') send() ">
-                        <button onclick="send()">GÖNDER</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<body style="background: black; color: cyan; font-family: monospace;">
+    <h1>Sistemler Aktif, Bay Stark.</h1>
+    <textarea id="input" placeholder="Komut girin, Bay Stark..."></textarea>
+    <button onclick="jarvisSpeak()">GÖNDER</button>
+    <p id="response"></p>
 
     <script>
-        setInterval(() => {
-            const d = new Date();
-            document.getElementById('clock').innerText = d.toTimeString().split(' ')[0];
-        }, 1000);
+        async function jarvisSpeak() {
+            const prompt = document.getElementById('input').value;
+            // Gemini Zekası Bağlantısı
+            const geminiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBw-x8T7Ww9v1XzYpQ-r5Lk8mN2jH3vG4a', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({contents: [{parts: [{text: prompt}]}]})
+            });
+            const data = await geminiResponse.json();
+            const text = data.candidates[0].content.parts[0].text;
+            document.getElementById('response').innerText = text;
 
-        const lines = ["SİSTEM BAŞLATILIYOR...", "JARVIS V4.2.1 YÜKLENİYOR...", "GÜVENLİK PROTOKOLLERİ AKTİF.", "TÜM SİSTEMLER NOMİNAL.", "HOŞ GELDİNİZ, BAY STARK."];
-        let currentLine = 0;
-        const bootText = document.getElementById('boot-text');
-        
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Önceki sesleri sustur
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'tr-TR'; // Türkçe konuşma dili
-                utterance.pitch = 0.8;    // J.A.R.V.I.S. tonu için sesi biraz kalınlaştırıyoruz
-                utterance.rate = 1.0;     // Konuşma hızı
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        function boot() {
-            if(currentLine < lines.length) {
-                const p = document.createElement('div');
-                p.className = 'boot-line active';
-                p.innerText = '> ' + lines[currentLine];
-                bootText.appendChild(p);
-                if(currentLine === 4) { speak("Hoş geldiniz Bay Stark."); }
-                currentLine++;
-                setTimeout(boot, 600);
-            } else {
-                setTimeout(() => { document.getElementById('boot-screen').style.opacity = '0'; setTimeout(() => document.getElementById('boot-screen').style.display = 'none', 600); }, 500);
-            }
-        }
-        setTimeout(boot, 400);
-
-        function send() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if(!text) return;
-            
-            const chat = document.getElementById('chat-messages');
-            chat.innerHTML += `<div class="msg-row user"><div class="avatar">TS</div><div class="bubble">${text}</div></div>`;
-            input.value = '';
-            chat.scrollTop = chat.scrollHeight;
-
-            setTimeout(() => {
-                const replyText = "Anlaşıldı Bay Stark. Veriler analiz ediliyor ve protokoller devreye alınıyor.";
-                chat.innerHTML += `<div class="msg-row"><div class="avatar">AI</div><div class="bubble">${replyText}</div></div>`;
-                chat.scrollTop = chat.scrollHeight;
-                speak(replyText); // Yapay zeka cevabını seslendirir
-            }, 1000);
+            // ElevenLabs Ses Bağlantısı
+            const audioResponse = await fetch('https://api.elevenlabs.io/v1/text-to-speech/wDsJlOXPqcvIUKdLXjDs', {
+                method: 'POST',
+                headers: {
+                    'xi-api-key': 'sk_2926978e63342f9ce27cec764b0ff32cbee73f29e16c31be',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({text: text})
+            });
+            const audioBlob = await audioResponse.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            new Audio(audioUrl).play();
         }
     </script>
 </body>
 </html>
-
