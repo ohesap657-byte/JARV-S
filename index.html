@@ -3,47 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>J.A.R.V.I.S. OS</title>
-    <script type="module">
-        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-        
-        const genAI = new GoogleGenerativeAI("AIzaSyA4Q6y4q5kX8Jz2-u5F9-L-K8pG1mN0vH5a");
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-        window.runJarvis = async () => {
-            const input = document.getElementById('input').value;
-            const chat = document.getElementById('chat');
-            if(!input) return;
-
-            chat.innerHTML += `<br>> <b>Siz:</b> ${input}`;
-            document.getElementById('input').value = "";
-            
-            try {
-                const result = await model.generateContent("Kısa ve asil bir JARVIS gibi cevap ver: " + input);
-                const response = await result.response.text();
-                chat.innerHTML += `<br>> <b>JARVIS:</b> ${response}`;
-                
-                const msg = new SpeechSynthesisUtterance(response);
-                msg.lang = 'tr-TR';
-                window.speechSynthesis.speak(msg);
-            } catch(e) {
-                chat.innerHTML += `<br>> <b>Sistem:</b> Modül yüklendi ancak API erişimi reddedildi.`;
-            }
-        };
-    </script>
     <style>
         body { background: #000508; color: #00d4ff; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .reactor { width: 150px; height: 150px; border: 4px solid #00d4ff; border-radius: 50%; box-shadow: 0 0 30px #00d4ff; margin-bottom: 20px; }
-        #chat { width: 90%; max-width: 500px; height: 300px; border: 1px solid #00d4ff; padding: 20px; overflow-y: auto; }
+        #chat { width: 90%; max-width: 500px; height: 300px; border: 1px solid #00d4ff; padding: 20px; overflow-y: auto; background: rgba(0, 10, 20, 0.8); }
         input { width: 70%; padding: 15px; background: #000; border: 1px solid #00d4ff; color: #fff; }
-        button { padding: 15px; background: #00d4ff; border: none; cursor: pointer; color: #000; }
+        button { padding: 15px; background: #00d4ff; border: none; cursor: pointer; color: #000; font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="reactor"></div>
-    <div id="chat">Sistemler nominal.</div>
+    <div id="chat">Sistemler yerel modda başlatıldı. Komut bekliyor...</div>
     <div style="width:90%; max-width:540px; display:flex;">
         <input type="text" id="input" placeholder="Komut...">
-        <button onclick="runJarvis()">GÖNDER</button>
+        <button onclick="jarvis()">GÖNDER</button>
     </div>
+
+    <script>
+        function jarvis() {
+            const input = document.getElementById('input');
+            const chat = document.getElementById('chat');
+            const text = input.value.toLowerCase();
+            if(!text) return;
+
+            chat.innerHTML += `<br>> <b>Siz:</b> ${text}`;
+            
+            // Yerel Mantık (API hatası almamak için)
+            let reply = "Sistemler nominal, Bay Stark.";
+            if(text.includes("merhaba")) reply = "Merhaba Bay Stark, bugün ne üzerinde çalışıyoruz?";
+            else if(text.includes("durum")) reply = "Tüm sistemler hatasız çalışıyor.";
+            else if(text.includes("kimsin")) reply = "Ben J.A.R.V.I.S., kişisel yapay zeka asistanınız.";
+            else reply = "Anlaşıldı, Bay Stark. İşleme alıyorum.";
+
+            chat.innerHTML += `<br>> <b>JARVIS:</b> ${reply}`;
+            input.value = "";
+            chat.scrollTop = chat.scrollHeight;
+
+            const msg = new SpeechSynthesisUtterance(reply);
+            msg.lang = 'tr-TR';
+            window.speechSynthesis.speak(msg);
+        }
+    </script>
 </body>
 </html>
