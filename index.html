@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. V4.2.1</title>
+    <title>J.A.R.V.I.S. - Stark Industries</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -15,163 +16,215 @@
             overflow: hidden;
             font-family: 'Share Tech Mono', monospace;
             color: #00d4ff;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
         }
-        /* Ark Reaktörü Tasarımı */
+        /* HUD Çizgileri ve Tarama Efekti */
+        .scanline {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent 50%, rgba(0, 212, 255, 0.02) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            z-index: 2;
+        }
+        /* Geliştirilmiş Ark Reaktörü */
         .arc-reactor {
             position: relative;
             width: 120px;
             height: 120px;
+            margin: 0 auto 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 30px;
+            cursor: pointer;
         }
         .ring {
-            border-radius: 50%;
-            border: 2px solid #00d4ff;
             position: absolute;
             width: 100%;
             height: 100%;
-            animation: ringPulse 2s ease-in-out infinite;
-            box-shadow: 0 0 20px #00d4ff, inset 0 0 20px #00d4ff;
+            border-radius: 50%;
+            border: 3px dashed #00d4ff;
+            animation: rotateRing 4s linear infinite;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
         }
         .core {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            background: radial-gradient(circle, #ffffff, #00d4ff, #0066aa);
-            animation: corePulse 0.5s ease-in-out infinite alternate;
-            box-shadow: 0 0 30px #00d4ff;
+            background: radial-gradient(circle, #ffffff, #00d4ff, #0044aa);
+            box-shadow: 0 0 30px #00d4ff, inset 0 0 10px #ffffff;
+            animation: pulseCore 1.5s ease-in-out infinite alternate;
         }
-        @keyframes ringPulse {
-            0%, 100% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.1); opacity: 1; }
-        }
-        @keyframes corePulse {
-            from { box-shadow: 0 0 20px #00d4ff; }
-            to { box-shadow: 0 0 40px #00d4ff; }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px #00d4ff;
         }
         /* Konsol Ekranı */
-        h1 {
-            font-size: 24px;
-            text-shadow: 0 0 10px #00d4ff;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .container {
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-        }
-        textarea {
-            width: 100%;
-            height: 80px;
-            background: rgba(0, 20, 30, 0.8);
+        .chat-box {
+            background: rgba(0, 20, 35, 0.6);
             border: 1px solid #00d4ff;
-            border-radius: 5px;
-            color: #fff;
-            padding: 10px;
-            font-family: monospace;
-            resize: none;
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 120px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            text-align: left;
+            box-shadow: inset 0 0 15px rgba(0, 212, 255, 0.2);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        /* Girdi Paneli */
+        .input-panel {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            background: rgba(0, 10, 20, 0.8);
+            border: 1px solid #00d4ff;
+            padding: 12px;
+            color: #ffffff;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 15px;
+            border-radius: 4px;
             outline: none;
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
-            margin-bottom: 15px;
+        }
+        input:focus {
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
         }
         button {
-            width: 100%;
-            background: #00d4ff;
-            color: #000;
-            border: none;
-            padding: 12px;
+            background: transparent;
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+            padding: 0 20px;
+            font-family: 'Orbitron', sans-serif;
             font-weight: bold;
-            font-family: 'Share Tech Mono', monospace;
             cursor: pointer;
-            border-radius: 5px;
-            box-shadow: 0 0 15px #00d4ff;
-            transition: all 0.3s;
+            border-radius: 4px;
+            transition: all 0.3s ease;
         }
         button:hover {
-            background: #fff;
-            box-shadow: 0 0 25px #fff;
+            background: #00d4ff;
+            color: #000508;
+            box-shadow: 0 0 15px #00d4ff;
         }
-        #response {
-            margin-top: 25px;
-            min-height: 50px;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 15px;
-            line-height: 1.5;
-            text-shadow: 0 0 5px #00d4ff;
+        /* Animasyonlar */
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulseCore {
+            from { transform: scale(0.9); opacity: 0.8; }
+            to { transform: scale(1.05); opacity: 1; }
         }
         @keyframes blink {
-            50% { opacity: 0.5; }
+            50% { opacity: 0.4; }
         }
     </style>
 </head>
 <body>
-
-    <div class="arc-reactor">
-        <div class="ring"></div>
-        <div class="core"></div>
-    </div>
-
+    <div class="scanline"></div>
+    
     <div class="container">
-        <h1>Sistemler Aktif, Bay Stark.</h1>
-        <textarea id="input" placeholder="Komut girin, Bay Stark..."></textarea>
-        <button onclick="jarvisSpeak()">PROTOKOLÜ BAŞLAT</button>
-        <div id="response"></div>
+        <!-- Ark Reaktörü -->
+        <div class="arc-reactor">
+            <div class="ring"></div>
+            <div class="core" id="reactor-core"></div>
+        </div>
+
+        <h1>J.A.R.V.I.S. HİZMETİNİZDE</h1>
+        
+        <!-- Cevap Alanı -->
+        <div class="chat-box" id="jarvis-status">
+            Sistemler aktif, Bay Stark. Bir komut bekleniyor...
+        </div>
+
+        <!-- Giriş Kutusu ve Buton -->
+        <div class="input-panel">
+            <input type="text" id="stark-command" placeholder="Komutunuzu girin, Bay Stark..." onkeypress="if(event.key === 'Enter') sendCommand()">
+            <button onclick="sendCommand()">GÖNDER</button>
+        </div>
     </div>
 
     <script>
-        const SYSTEM_INSTRUCTION = "Sen Iron Man filmindeki yapay zeka J.A.R.V.I.S.'sin. Kullanıcın Tony Stark (Bay Stark). Konuşma tarzın her zaman son derece kibar, asil, sadık, hafif ingiliz aksanlı bir beyefendi gibi olmalı. Cevapların çok uzun olmasın, net ve sinematik olsun. Türkçe cevap ver.";
+        const SYSTEM_INSTRUCTION = "Sen Iron Man filmindeki yapay zeka J.A.R.V.I.S.'sin. Kullanıcın Tony Stark (Bay Stark). Konuşma tarzın son derece kibar, asil, sadık ve hafif mesafeli bir İngiliz beyefendisi gibi olmalı. Cevapların çok uzun olmasın, net, vurucu ve sinematik olsun. Kesinlikle Türkçe cevap ver.";
 
-        async function jarvisSpeak() {
-            const prompt = document.getElementById('input').value;
-            const responseDiv = document.getElementById('response');
-            if (!prompt.trim()) return;
+        async function sendCommand() {
+            const inputField = document.getElementById('stark-command');
+            const statusBox = document.getElementById('jarvis-status');
+            const core = document.getElementById('reactor-core');
+            
+            const command = inputField.value.trim();
+            if (!command) return;
 
-            responseDiv.innerHTML = "<span style='animation: blink 1s infinite;'>Analiz ediliyor, Bay Stark...</span>";
-
+            // Girişi temizle
+            inputField.value = "";
+            
             try {
-                // 1. ADIM: Gemini Zekası
-                const geminiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBw-x8T7Ww9v1XzYpQ-r5Lk8mN2jH3vG4a', {
+                // Reaktörü yükleniyor durumuna getir (Kırmızı/Turuncu efekt)
+                statusBox.innerHTML = "<span style='animation: blink 0.8s infinite;'>Veriler analiz ediliyor, veri tabanları taranıyor...</span>";
+                core.style.background = "radial-gradient(circle, #ffffff, #ffaa00, #aa3300)";
+                core.style.boxShadow = "0 0 30px #ffaa00";
+
+                // 1. Adım: Gemini Zekası Bağlantısı
+                const geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBw-x8T7Ww9v1XzYpQ-r5Lk8mN2jH3vG4a";
+                const geminiResponse = await fetch(geminiUrl, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({contents: [{parts: [{text: SYSTEM_INSTRUCTION + "\n\nBay Stark: " + prompt}]}]})
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: SYSTEM_INSTRUCTION + "\n\nBay Stark: " + command }] }]
+                    })
                 });
-                const data = await geminiResponse.json();
-                const text = data.candidates[0].content.parts[0].text;
-                responseDiv.innerText = text;
 
-                // 2. ADIM: ElevenLabs Ses Motoru
-                const audioResponse = await fetch('https://api.elevenlabs.io/v1/text-to-speech/wDsJlOXPqcvIUKdLXjDs', {
+                const geminiData = await geminiResponse.json();
+                const jarvisAnswer = geminiData.candidates[0].content.parts[0].text;
+
+                // Metni ekrana yazdır
+                statusBox.innerText = jarvisAnswer;
+
+                // 2. Adım: ElevenLabs Ses Motoru Bağlantısı
+                const elevenUrl = "https://api.elevenlabs.io/v1/text-to-speech/wDsJlOXPqcvIUKdLXjDs";
+                const audioResponse = await fetch(elevenUrl, {
                     method: 'POST',
                     headers: {
                         'xi-api-key': 'sk_2926978e63342f9ce27cec764b0ff32cbee73f29e16c31be',
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        text: text,
+                        text: jarvisAnswer,
                         model_id: "eleven_multilingual_v2",
-                        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+                        voice_settings: { stability: 0.45, similarity_boost: 0.8 }
                     })
                 });
 
-                if(audioResponse.ok) {
+                if (audioResponse.ok) {
                     const audioBlob = await audioResponse.blob();
                     const audioUrl = URL.createObjectURL(audioBlob);
                     const audio = new Audio(audioUrl);
-                    audio.play().catch(e => console.log("Ses otomatik oynatılamadı, tarayıcı izni gerekiyor:", e));
+                    audio.play();
                 }
 
             } catch (error) {
-                responseDiv.innerText = "Güvenli bağlantı hatası, Bay Stark.";
+                statusBox.innerHTML = "<span style='color: #ff3333;'>Güvenlik Duvarı Hatası: Bağlantı kurulamadı, Bay Stark.</span>";
                 console.error(error);
+            } finally {
+                // Reaktörü normal mavi rengine geri döndür
+                core.style.background = "radial-gradient(circle, #ffffff, #00d4ff, #0044aa)";
+                core.style.boxShadow = "0 0 30px #00d4ff";
             }
         }
     </script>
